@@ -47,9 +47,9 @@ If the project is meant to behave like an installed application, keep PWA suppor
 ## Runtime Model
 
 - Local development runs the Next.js app on the host with `pnpm dev`.
-- `docker-compose.dev.yml` starts external dependencies only, currently PostgreSQL.
-- Production uses `docker-compose.prod.yml`, which includes the app image and durable Postgres volume.
-- Dokploy uses `docker-compose.dokploy.yml`, which includes the base app stack, bind-mounts Postgres under `APP_HOST_DATA_ROOT`, and attaches the app to Dokploy's external Traefik network.
+- The default `docker-compose.yml` starts external dependencies only, currently PostgreSQL.
+- Production uses `docker-compose.prod.yml`, which adds the app image, a published port, and a durable Postgres volume on top of the shared base in `docker-compose.shared.yml`.
+- Dokploy uses `docker-compose.dokploy.yml`, which extends the same shared base, bind-mounts Postgres under `APP_HOST_DATA_ROOT`, and attaches the app to Dokploy's external Traefik network without publishing ports.
 - Env files are convenience inputs. Commands should also work when variables are injected by CI or the deployment platform.
 
 ## Architecture Boundaries

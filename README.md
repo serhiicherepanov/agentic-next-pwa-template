@@ -58,7 +58,7 @@ The production image runs Prisma deploy migrations on startup by default. Set `A
 
 ## Dokploy
 
-Dokploy should use `docker-compose.dokploy.yml`. It reuses the base app stack, stores Postgres under `APP_HOST_DATA_ROOT`, and connects the app to Dokploy's external Traefik network without publishing ports from the compose file.
+Dokploy should use `docker-compose.dokploy.yml`. It reuses the shared production stack from `docker-compose.shared.yml`, stores Postgres under `APP_HOST_DATA_ROOT`, and connects the app to Dokploy's external Traefik network without publishing ports from the compose file.
 
 Minimum Dokploy env:
 
