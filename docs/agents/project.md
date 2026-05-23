@@ -8,7 +8,7 @@ This template is a small production starter for Next.js applications that are ma
 |---|---|
 | App | Next.js App Router, React, TypeScript strict |
 | UI | Tailwind CSS, shadcn/ui conventions, Radix primitives |
-| Data | PostgreSQL 16, Prisma 6 |
+| Data | PostgreSQL 16, Prisma 6 (Neon serverless driver optional for Vercel) |
 | Server state | TanStack Query |
 | Client state | zustand for local UI state only |
 | Forms | react-hook-form + Zod |
@@ -30,6 +30,15 @@ Use Centrifugo as the first-choice realtime and lightweight messaging layer when
 - Derive channel access on the server from the authenticated session or role. Do not trust channel names from request bodies.
 - Keep the transport behind a small module such as `lib/realtime/publisher.ts` so the app can run without realtime in early phases and tests can mock publishing.
 - If Centrifugo is added, update Docker Compose, env examples, README, OpenAPI/auth docs where relevant, and Playwright coverage for at least one live-update flow.
+
+### Serverless Postgres (Vercel / Neon)
+
+The project can be deployed to Vercel using Neon Serverless Postgres without forking the codebase. Prisma is wired through `@prisma/adapter-neon`, which is activated only when `DATABASE_DRIVER=neon` is set.
+
+- Default behavior is unchanged: local dev, Docker Compose, and Dokploy run with `DATABASE_DRIVER=pg` (or unset) and the bundled Prisma Postgres engine.
+- On Vercel set `DATABASE_DRIVER=neon` and `DATABASE_URL` to the Neon pooled connection string (`-pooler` host, `sslmode=require`).
+- Migrations must be run against the non-pooled Neon URL (`pnpm exec prisma migrate deploy`). Do not run `prisma migrate` against the pooler endpoint.
+- Keep the adapter switching inside `lib/db.ts` and the new env var documented in all `.env.*.example` files. Do not import Neon packages directly from feature modules.
 
 ### PWA App Mode
 
