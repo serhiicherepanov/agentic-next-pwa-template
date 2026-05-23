@@ -5,6 +5,9 @@ build
 coverage
 playwright-report
 test-artifacts
+public/sw.js
+public/workbox-*.js
+public/worker-*.js
 
 .env
 .env.local

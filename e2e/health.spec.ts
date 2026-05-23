@@ -13,4 +13,8 @@ test("home page and health endpoint work", async ({ page, request }) => {
       service: "agentic-next-pwa-template",
     }),
   );
+
+  const manifest = await request.get("/manifest.webmanifest");
+  expect(manifest.ok()).toBe(true);
+  expect(manifest.headers()["content-type"]).toMatch(/application\/manifest\+json/u);
 });

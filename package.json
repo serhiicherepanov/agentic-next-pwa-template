@@ -55,6 +55,7 @@
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.3.4",
+    "@ducanh2912/next-pwa": "^10.2.9",
     "@hookform/resolvers": "^3.9.0",
     "@prisma/client": "^6.19.0",
     "@radix-ui/react-slot": "^1.2.3",

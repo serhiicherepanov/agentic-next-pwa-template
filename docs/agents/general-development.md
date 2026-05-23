@@ -48,5 +48,6 @@ When changing how people develop, test, run, deploy, or configure the app, updat
 
 First-party `*.ts` and `*.tsx` files should stay easy to review.
 
-- Soft target: 400 non-blank, non-comment lines.
-- Split large modules by ownership boundary before they become hard to review.
+- Soft target: 400 non-blank, non-comment lines (enforced as a `warn` by ESLint).
+- Functions: aim for ≤ 80 lines.
+- Split large modules by ownership boundary, not by mechanical chunking. See [`modularity.md`](modularity.md) for the feature-sliced module layout that this budget supports.

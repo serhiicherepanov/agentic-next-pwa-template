@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Agentic PWA icon">
+  <rect width="512" height="512" rx="112" fill="#171717" />
+  <path d="M146 346 256 106l110 240h-58l-20-48h-64l21-50h22l-11-27-52 125h-58Z" fill="#fafafa" />
+  <circle cx="364" cy="148" r="32" fill="#fafafa" />
+</svg>
