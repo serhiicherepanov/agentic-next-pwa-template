@@ -1,0 +1,16 @@
+include:
+  - docker-compose.yml
+
+services:
+  db:
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    ports:
+      - "${APP_HTTP_PORT:-3080}:3000"
+
+volumes:
+  pgdata:
+    external: true
+    name: agentic-template-prod_pgdata

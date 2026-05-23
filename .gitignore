@@ -1,0 +1,17 @@
+node_modules
+.next
+out
+build
+coverage
+playwright-report
+test-artifacts
+
+.env
+.env.local
+.env.dev
+.env.dev.local
+.env.e2e
+.env.prod
+
+*.log
+.DS_Store

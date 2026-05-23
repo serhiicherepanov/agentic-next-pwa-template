@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm test:ci:install
+
+      - name: Start local dependencies
+        run: pnpm dev:deps:e2e
+
+      - name: Apply database migrations
+        run: pnpm db:migrate
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Unit tests
+        run: pnpm test:ci:unit
+
+      - name: Production build
+        run: pnpm build
+
+      - name: Install Playwright browsers
+        run: pnpm test:ci:pre
+
+      - name: Playwright smoke
+        run: pnpm test:ci:e2e
+
+      - name: Stop local dependencies
+        if: always()
+        run: pnpm dev:deps:e2e:down

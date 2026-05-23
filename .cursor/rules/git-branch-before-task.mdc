@@ -1,0 +1,21 @@
+---
+description: Before new task work, refresh the default branch and create a dedicated branch
+alwaysApply: true
+---
+
+# Git: Branch First
+
+For any new PR-bound task, create a dedicated branch before editing tracked files.
+
+```bash
+git fetch origin
+git switch main
+git pull --ff-only origin main
+git switch -c feature/<short-slug>
+```
+
+Use `fix/<short-slug>` for fixes and `chore/<short-slug>` for maintenance.
+
+If this repository uses `master`, replace `main` with `master` consistently in this rule and in `docs/agents/version-control.md`.
+
+Do not commit directly on the default branch.
