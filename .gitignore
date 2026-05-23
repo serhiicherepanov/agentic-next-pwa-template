@@ -14,4 +14,5 @@ test-artifacts
 .env.prod
 
 *.log
+tsconfig.tsbuildinfo
 .DS_Store
