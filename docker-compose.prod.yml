@@ -1,5 +1,11 @@
+# Self-hosted production stack: builds the app image, publishes it on a host
+# port, and stores Postgres in a named external volume.
+#
+#   docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
+name: agentic-template-prod
+
 include:
-  - docker-compose.yml
+  - docker-compose.shared.yml
 
 services:
   db:

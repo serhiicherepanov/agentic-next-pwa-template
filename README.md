@@ -9,8 +9,15 @@ Production-minded starter for Next.js App Router projects where agents and human
 - Tailwind CSS 4 + shadcn/ui conventions
 - Zod schemas + generated OpenAPI at `/api/openapi.json` and `/docs`
 - TanStack Query, zustand, react-hook-form
+- Optional PWA manifest and service worker via `@ducanh2912/next-pwa`
 - Vitest, Playwright, ESLint, Husky
 - Docker Compose for local dependencies and production runtime
+
+## Priority Extensions
+
+Realtime and lightweight messaging should use Centrifugo first when the product needs live updates, fan-out notifications, presence, or user-scoped event streams. Keep REST and PostgreSQL as the source of truth, publish small server-side events after successful writes, and hide the transport behind a module such as `lib/realtime/publisher.ts`.
+
+PWA is not required for ordinary websites, landing pages, or content sites. Enable it only when the product should behave like an application: dashboards, admin panels, mobile worker tools, or stores that intentionally support installable app behavior. Set `PWA_ENABLED=1`, keep `app/manifest.ts`, installable icons, service worker registration, and at least one Playwright check for `/manifest.webmanifest` in sync. Replace the placeholder SVG icon with generated PNG icon sizes before production launch.
 
 ## Local Setup
 
@@ -51,7 +58,7 @@ The production image runs Prisma deploy migrations on startup by default. Set `A
 
 ## Dokploy
 
-Dokploy should use `docker-compose.dokploy.yml`. It reuses the base app stack, stores Postgres under `APP_HOST_DATA_ROOT`, and connects the app to Dokploy's external Traefik network without publishing ports from the compose file.
+Dokploy should use `docker-compose.dokploy.yml`. It reuses the shared production stack from `docker-compose.shared.yml`, stores Postgres under `APP_HOST_DATA_ROOT`, and connects the app to Dokploy's external Traefik network without publishing ports from the compose file.
 
 Minimum Dokploy env:
 
