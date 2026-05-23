@@ -2,9 +2,16 @@
 
 ## Branching
 
-Every PR-bound task should happen on a dedicated branch from the updated default branch.
+Every PR-bound task should happen on a dedicated branch cut from the latest remote default branch. Never branch from a stale local `main`.
 
-Default procedure:
+Preferred procedure (branches directly from `origin/main`, immune to a stale local copy):
+
+```bash
+git fetch origin
+git switch -c feature/<short-slug> origin/main
+```
+
+If you also want to update the local default branch first:
 
 ```bash
 git fetch origin
@@ -12,6 +19,8 @@ git switch main
 git pull --ff-only origin main
 git switch -c feature/<short-slug>
 ```
+
+If `git pull --ff-only` fails because local `main` has diverged from `origin/main`, do not proceed from the stale state. Either branch from `origin/main` directly, or, with explicit user confirmation, reset the local branch (`git reset --hard origin/main`) before creating the task branch. Never silently keep diverged local commits on `main`.
 
 Use `fix/<short-slug>` for bug fixes and `chore/<short-slug>` for maintenance.
 

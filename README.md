@@ -80,6 +80,28 @@ APP_HOST_DATA_ROOT=/opt/agentic-next-pwa-template pnpm docker:dokploy:dirs
 docker compose --env-file .env.prod -f docker-compose.dokploy.yml up -d --build
 ```
 
+## Vercel + Neon Serverless Postgres
+
+The app can run on Vercel with [Neon](https://neon.tech) as the Postgres provider without changing application code. Prisma is routed through the official `@prisma/adapter-neon` driver adapter, which uses HTTP/WebSocket and works in serverless and edge runtimes.
+
+1. Create a Neon project and copy the pooled connection string (host ends with `-pooler.<region>.aws.neon.tech`). Use the non-pooled URL only for migrations.
+2. In Vercel project settings add:
+
+```dotenv
+DATABASE_URL=postgresql://<user>:<password>@<project>-pooler.<region>.aws.neon.tech/<db>?sslmode=require
+DATABASE_DRIVER=neon
+LOG_LEVEL=info
+```
+
+3. Run migrations once from your machine against the non-pooled URL:
+
+```bash
+DATABASE_URL="postgresql://<user>:<password>@<project>.<region>.aws.neon.tech/<db>?sslmode=require" \
+  pnpm exec prisma migrate deploy
+```
+
+Local development and self-hosted Docker deployments keep `DATABASE_DRIVER=pg` (or leave it unset) and continue to use the bundled Prisma Postgres engine.
+
 ## Agent Workflow
 
 Start with `AGENTS.md`. Keep `README.md`, env examples, and `docs/agents/*` in sync when changing how the project is developed, tested, or deployed.

@@ -5,7 +5,14 @@ alwaysApply: true
 
 # Git: Branch First
 
-For any new PR-bound task, create a dedicated branch before editing tracked files.
+For any new PR-bound task, create a dedicated branch from the latest remote default branch before editing tracked files.
+
+```bash
+git fetch origin
+git switch -c feature/<short-slug> origin/main
+```
+
+Always branch from `origin/main` (or `origin/master`), never from a stale local `main`. If the local default branch is needed, update it explicitly before branching:
 
 ```bash
 git fetch origin
@@ -13,6 +20,11 @@ git switch main
 git pull --ff-only origin main
 git switch -c feature/<short-slug>
 ```
+
+If `git pull --ff-only` fails because local `main` has diverged, do not silently branch from the stale state. Either:
+
+- Branch directly from `origin/main` (`git switch -c <branch> origin/main`), or
+- Reset local `main` to the remote with explicit user confirmation (`git reset --hard origin/main`), then branch.
 
 Use `fix/<short-slug>` for fixes and `chore/<short-slug>` for maintenance.
 
