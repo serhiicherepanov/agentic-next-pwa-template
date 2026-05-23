@@ -25,4 +25,5 @@ This file is the entry point for AI agents and automation working in this repo. 
 - Database: PostgreSQL through Prisma.
 - Local dev: app runs on the host, Postgres runs in Docker.
 - Production: app and database run through Docker Compose.
+- Dokploy: use `docker-compose.dokploy.yml` so platform Traefik handles routing.
 - API docs: `/docs` and `/api/openapi.json`.

@@ -40,12 +40,38 @@ Use `PLAYWRIGHT_NO_WEBSERVER=1 pnpm e2e` when a dev server is already running.
 
 ## Production
 
+Self-hosted Docker Compose with a direct published app port:
+
 ```bash
 cp .env.prod.example .env.prod
 pnpm prod:up
 ```
 
 The production image runs Prisma deploy migrations on startup by default. Set `APP_AUTO_MIGRATE=0` if migrations are managed separately.
+
+## Dokploy
+
+Dokploy should use `docker-compose.dokploy.yml`. It reuses the base app stack, stores Postgres under `APP_HOST_DATA_ROOT`, and connects the app to Dokploy's external Traefik network without publishing ports from the compose file.
+
+Minimum Dokploy env:
+
+```dotenv
+APP_HOST_DATA_ROOT=/opt/agentic-next-pwa-template
+DOKPLOY_NETWORK=dokploy-network
+POSTGRES_USER=agentic
+POSTGRES_PASSWORD=replace-with-a-long-random-password
+POSTGRES_DB=agentic
+DATABASE_URL=postgresql://agentic:replace-with-a-long-random-password@db:5432/agentic?schema=public
+APP_AUTO_MIGRATE=1
+LOG_LEVEL=info
+```
+
+Prepare the host directory once when managing the server manually:
+
+```bash
+APP_HOST_DATA_ROOT=/opt/agentic-next-pwa-template pnpm docker:dokploy:dirs
+docker compose --env-file .env.prod -f docker-compose.dokploy.yml up -d --build
+```
 
 ## Agent Workflow
 

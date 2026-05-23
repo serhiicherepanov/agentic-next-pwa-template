@@ -1,0 +1,30 @@
+# Dokploy entrypoint. Dokploy provides Traefik and the external network; this
+# file adds durable Postgres storage through host bind mounts.
+#
+#   docker compose --env-file .env.prod -f docker-compose.dokploy.yml up -d --build
+#
+# Required Dokploy env:
+#   APP_HOST_DATA_ROOT=/opt/<your-app-name>
+#   DOKPLOY_NETWORK=dokploy-network
+
+include:
+  - path: ./docker-compose.yml
+
+networks:
+  dokploy-network:
+    external: true
+    name: ${DOKPLOY_NETWORK:-dokploy-network}
+
+services:
+  db:
+    volumes:
+      - type: bind
+        source: ${APP_HOST_DATA_ROOT:?required}/postgres
+        target: /var/lib/postgresql/data
+
+  app:
+    networks:
+      - default
+      - dokploy-network
+    labels:
+      - traefik.docker.network=${DOKPLOY_NETWORK:-dokploy-network}

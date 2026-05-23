@@ -12,6 +12,7 @@
     "dev:deps:e2e:down": "docker compose --env-file .env.e2e -f docker-compose.dev.yml down",
     "docker:volumes:local": "bash scripts/ensure-docker-data-volumes.sh local",
     "docker:volumes:prod": "bash scripts/ensure-docker-data-volumes.sh prod",
+    "docker:dokploy:dirs": "bash scripts/ensure-dokploy-host-dirs.sh",
     "prod:up": "pnpm docker:volumes:prod && docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build",
     "prod:down": "docker compose --env-file .env.prod -f docker-compose.prod.yml down",
     "prod:build": "docker compose --env-file .env.prod -f docker-compose.prod.yml build",
