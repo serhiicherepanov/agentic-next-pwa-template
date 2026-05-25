@@ -28,8 +28,7 @@ app/                                  thin route wrappers only
 modules/
   <feature>/
     index.ts                          public API; the ONLY entry point from outside
-    domain/                           pure types and invariants, no I/O
-    data/                             Prisma repositories (server-only)
+    services/                         ALL business logic (DB, rules, aggregations)
     schemas/                          Zod schemas shared by api + forms
     api/                              route handler bodies + OpenAPI paths
     ui/                               React components for this feature
@@ -48,6 +47,21 @@ lib/                                  reserved for shared/* during migration; pr
 
 `app/` becomes a thin transport layer. A route file should generally be 5–15 lines: validate the request, call the module, return the response.
 
+## Business Logic: One Folder (`services/`)
+
+Anything that is not visualization goes in **`modules/<feature>/services/`** — queries, calculations, aggregations, domain rules. Not in `ui/`, not in `app/`, not split across several top-level folders.
+
+The main reason is **DRY across surfaces**: admin UI, client UI, and REST routes must call the **same** service functions. If each screen owns its own Prisma query, filters and totals drift apart.
+
+Rules:
+
+- **One place per feature:** `services/`. More files inside that folder are fine; logic does not belong in `ui/` or parallel folders.
+- **No Prisma or raw SQL** outside `services/` (except migrations).
+- **React components** only format for display (dates, currency, empty states).
+- **Route handlers** validate → call one service → return response.
+- **Admin and client** import from the same `services/` (parameters or thin wrappers if scope differs — not a second copy in another component).
+- Feature-specific logic stays in that module's `services/`. Do not park it in `shared/`.
+
 ## Module Contract
 
 Every module under `modules/<feature>/` exposes a single public API through its `index.ts`. Everything else is private to the module.
@@ -55,7 +69,8 @@ Every module under `modules/<feature>/` exposes a single public API through its 
 ```ts
 export { CatalogPage } from "./ui/catalog-page";
 export { catalogAdminHandlers } from "./api/admin-handlers";
-export type { CatalogItem } from "./domain/catalog-item";
+export { listCatalogItems, getCatalogItem } from "./services/catalog";
+export type { CatalogItem } from "./services/catalog.types";
 ```
 
 Consumers import only the barrel:
@@ -64,17 +79,18 @@ Consumers import only the barrel:
 import { CatalogPage } from "@/modules/catalog";
 ```
 
-Deep imports from outside the module (`@/modules/catalog/data/...`) are forbidden.
+Deep imports from outside the module (`@/modules/catalog/services/...`) are forbidden — use the barrel.
 
 ## Hard Rules
 
 1. **Import only through the module barrel** from outside the module. Deep cross-module paths are an ESLint error.
-2. **`app/` is a thin layer.** No business logic in `page.tsx` or `route.ts`. They wire request → module → response.
-3. **`shared/` must not depend on `modules/`.** Ever. Dependencies only flow `modules/` → `shared/`.
-4. **`modules/X` must not depend on `modules/Y` directly** — only through `modules/Y`'s barrel. Cycles are forbidden.
-5. **File size budget**: `max-lines: 400` (already enforced as `warn`; promote to `error` once the project stabilizes). Functions: aim for ≤ 80 lines. Large files must be split by ownership boundary, not by mechanical chunking.
-6. **Server/client separation by naming**: prefer `*.server.ts`, `*.client.ts`, `*.shared.ts` suffixes (or Next.js `"use server"` / `"use client"` directives) so server-only code cannot leak into the client bundle.
-7. **Tests live next to the code** they cover, under `__tests__/` inside the module.
+2. **`app/` is a thin layer.** No business logic in `page.tsx` or `route.ts`. They wire request → module service → response.
+3. **Business logic stays in `services/` only.** UI and API handlers do not query the database, aggregate, or encode domain rules.
+4. **`shared/` must not depend on `modules/`.** Ever. Dependencies only flow `modules/` → `shared/`.
+5. **`modules/X` must not depend on `modules/Y` directly** — only through `modules/Y`'s barrel. Cycles are forbidden.
+6. **File size budget**: `max-lines: 400` (already enforced as `warn`; promote to `error` once the project stabilizes). Functions: aim for ≤ 80 lines. Large files must be split by ownership boundary, not by mechanical chunking.
+7. **Server/client separation by naming**: prefer `*.server.ts`, `*.client.ts`, `*.shared.ts` suffixes (or Next.js `"use server"` / `"use client"` directives) so server-only code cannot leak into the client bundle.
+8. **Tests live next to the code** they cover, under `__tests__/` inside the module.
 
 ## When To Create A New Module
 
@@ -118,7 +134,7 @@ If you fork this template into a project that already grew the layer-first way, 
 
 1. Add ESLint boundary rules and `max-lines` as `warn`. This freezes further decay without breaking the build.
 2. Split the largest files first (one PR each). The top offenders are usually the highest ROI.
-3. Pick one feature as a pilot and move it into `modules/<feature>/` end-to-end (data + schemas + api + ui + tests). This becomes the template for the rest.
+3. Pick one feature as a pilot and move it into `modules/<feature>/` end-to-end (services + schemas + api + ui + tests). This becomes the template for the rest.
 4. Migrate the remaining features one module per PR.
 5. Move `lib/shared/` content into `shared/` with topical subfolders. Break up `utils.ts`.
 6. Reduce `app/api/**` route files to thin wrappers.

@@ -16,6 +16,7 @@ This file is the entry point for AI agents and automation working in this repo. 
 
 - Start new PR-bound work from a fresh branch. See `.cursor/rules/git-branch-before-task.mdc`.
 - Follow the feature-sliced module layout in `docs/agents/modularity.md`. Cross-module imports go through the module's `index.ts` barrel; deep imports are forbidden.
+- Keep all business logic in `modules/<feature>/services/` only — not in `app/`, UI, or route handlers. Admin, client, and API import the same service functions. See `.cursor/rules/business-logic-in-services.mdc`.
 - Keep runtime and workflow docs in sync. If commands, env vars, Docker, CI, or setup steps change, update `README.md` and `docs/agents/*` in the same PR.
 - Keep REST API contracts in sync. Every route under `app/api/**` must have shared Zod schemas where practical and OpenAPI registration in `lib/openapi/`.
 - Do not commit secrets. Env examples are documentation, not real credentials.

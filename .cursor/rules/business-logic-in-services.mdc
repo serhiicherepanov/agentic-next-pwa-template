@@ -1,0 +1,67 @@
+---
+description: All business logic in modules/<feature>/services/ — one place, shared by all UIs and API
+alwaysApply: true
+---
+
+# Business Logic In Services
+
+All non-visualization logic lives in **one folder per feature**: `modules/<feature>/services/`.
+
+**Goal:** one implementation per rule or query. Admin, client, pages, and API routes import the **same** functions from the module barrel — never duplicate Prisma, filters, aggregations, or calculations in another file.
+
+## What Goes In `services/`
+
+Everything that is not UI:
+
+- Database reads/writes, filtering, pagination
+- Aggregations, totals, reports
+- Calculations, pricing, eligibility, domain rules
+- Orchestration of multiple steps or external calls
+
+Split into multiple files inside `services/` when it grows (`orders.ts`, `order-stats.ts`) — still one folder, one owner.
+
+## What Does NOT Hold Business Logic
+
+| Location | Role |
+|---|---|
+| `modules/**/ui/**`, `components/**` | Render only; call services |
+| `modules/**/api/**`, `app/**` | Auth/validate → call service → HTTP response |
+| `modules/**/schemas/**` | Request/form shape (Zod), not domain rules |
+
+## Admin vs Client
+
+Same feature, different screens → **same `services/`**, different UI files.
+
+```ts
+// ❌ BAD — logic in two components
+// ui/admin-orders.tsx + ui/my-orders.tsx each with own prisma + reduce
+
+// ✅ GOOD — one folder, two UIs
+// services/orders.ts
+export async function listOrdersForAdmin() { ... }
+export async function listOrdersForUser(userId: string) { ... }
+
+// ui/admin-orders.tsx
+import { listOrdersForAdmin } from "../services/orders";
+
+// ui/my-orders.tsx
+import { listOrdersForUser } from "../services/orders";
+```
+
+Prefer one function with parameters when the logic is the same apart from scope:
+
+```ts
+export async function listOrders(opts: { scope: "admin" } | { scope: "user"; userId: string }) { ... }
+```
+
+## Forbidden
+
+- Prisma or business rules in `ui/`, `app/`, client hooks
+- Copy-pasting a query “for the admin version” instead of extending `services/`
+- Putting feature logic in `shared/` (only truly generic helpers belong there)
+
+## When Adding Logic
+
+1. Open `modules/<feature>/services/` (create the folder if missing).
+2. Add or extend a service function; export it from `index.ts`.
+3. Wire `ui/`, `api/`, and `app/` to that export only.
