@@ -64,7 +64,7 @@ If the project is meant to behave like an installed application, keep PWA suppor
 ## Architecture Boundaries
 
 - Code is organized **by feature**, not by technical layer. See [`modularity.md`](modularity.md) for the full layout, module contract, and import rules.
-- Each feature lives under `modules/<feature>/` with its own `domain/`, `data/`, `schemas/`, `api/`, `ui/`, and `__tests__/`. The module's `index.ts` is its only public API.
+- Each feature lives under `modules/<feature>/` with `services/` (all business logic), `schemas/`, `api/`, `ui/`, and `__tests__/`. The module's `index.ts` is its only public API. Admin, client, and routes share the same `services/` — never duplicate logic in UI or `app/`.
 - `app/` is a thin transport layer. Route Handlers and pages wire request → module → response and contain no business logic.
 - `shared/` holds cross-cutting infrastructure only (db client, logger, http helpers, pure utils). It must not depend on `modules/`.
 - Prisma is the default database access layer. Avoid raw SQL outside migrations or well-justified performance paths.
